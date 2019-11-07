@@ -36,6 +36,15 @@ def get_transforms_batch(imgs):
     return imgs
 
 model = get_model()
+
+class ImagenetClassifier():
+    def predict(self,url):
+        img = get_img(url)
+        imgs = get_transforms_batch(img)
+        outp = model(imgs)
+        return outp
+        
+
 img_transforms = get_transforms
 imagenete_id_cat = json.load(open('imagenet_class_index.json'))
 
