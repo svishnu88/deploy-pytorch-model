@@ -64,11 +64,12 @@ def predict():
     outp = model(img_transforms()(img).unsqueeze(0))
     return f'{get_preds(outp)}'
 
-streamer = ThreadedStreamer(model,batch_size=64,max_latency=0.1)
+cmodel = ImagenetClassifier()
+streamer = ThreadedStreamer(cmodel.predict,batch_size=64,max_latency=0.1)
 @app.route("/stream", methods=["POST"])
 def stream_predict():
-    img =  get_img(request.args['url'])
-    outp = streamer.model(img)
+    #img =  get_img(request.args['url'])
+    outp = streamer.predict(request.args['url'])
     return outp
 
 if __name__ == '__main__':
