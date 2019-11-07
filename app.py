@@ -38,9 +38,9 @@ def get_transforms_batch(imgs):
 model = get_model()
 
 class ImagenetClassifier():
-    def predict(self,url):
-        img = get_img(url)
-        imgs = get_transforms_batch(img)
+    def predict(self,urls):
+        imgs = [get_img(url) for url in urls]
+        imgs = get_transforms_batch(imgs)
         outp = model(imgs)
         return outp
         
