@@ -9,9 +9,10 @@ import json
 import pdb
 
 app = Flask(__name__)
-
+device = torch.device('cuda')
 def get_model():
-    model = torch.hub.load('pytorch/vision', 'resnet18', pretrained=True)
+    model = torch.hub.load('pytorch/vision', 'resnet101', pretrained=True)
+    model = model.to(device)
     model.eval()
     return model
 
@@ -41,6 +42,7 @@ model = get_model()
 def predict_batch(urls):
     imgs =  [get_img(url) for url in urls]
     imgs = get_transforms_batch(imgs)
+    imgs = imgs.to(device)
     outp = model(imgs)
     return [get_preds(outp)]
         
@@ -60,7 +62,8 @@ def get_preds(preds):
 @app.route('/predict',methods=['POST'])
 def predict():
     img =  get_img(request.args['url'])
-    outp = model(img_transforms()(img).unsqueeze(0))
+    img_t = img_transforms()(img).unsqueeze(0).to(device)
+    outp = model(img_t)
     return f'{get_preds(outp)}'
 
 streamer = ThreadedStreamer(predict_batch,batch_size=64,max_latency=0.1)
@@ -71,4 +74,4 @@ def stream_predict():
     return str(outp)
 
 if __name__ == '__main__':
-   app.run(debug=True)
+   app.run(debug=False)
